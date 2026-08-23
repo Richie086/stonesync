@@ -86,7 +86,7 @@ test.describe('StoneSync AI Analytics & Real-Time Suite', () => {
   });
 
   test('Player Name Prompt Modal & Custom Display Name Sync', async ({ page }) => {
-    await page.goto('/go?room=identity-test-room');
+    await page.goto('/go?room=identity-test-room&board_size=19');
 
     const modal = page.locator('#name-prompt-overlay');
     if (!(await modal.isVisible())) {
@@ -104,6 +104,30 @@ test.describe('StoneSync AI Analytics & Real-Time Suite', () => {
     await expect(modal).toHaveClass(/modal-hidden/);
     const playersList = page.locator('#players-list');
     await expect(playersList).toContainText('GoMaster_Playwright');
+  });
+
+  test('Board Size Prompt for new rooms', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('stonesync_player_name', 'PlaywrightUser'));
+    await page.goto('/go?room=new-board-size-room');
+
+    const modal = page.locator('#board-size-prompt-overlay');
+    await expect(modal).toBeVisible();
+
+    // Verify 9x9 is primary (default)
+    const btn9x9 = page.locator('.board-size-btn[data-size="9"]');
+    await expect(btn9x9).toHaveClass(/btn-primary/);
+
+    // Select 13x13
+    const btn13x13 = page.locator('.board-size-btn[data-size="13"]');
+    await btn13x13.click();
+    await expect(btn13x13).toHaveClass(/btn-primary/);
+
+    // Click start
+    await page.locator('#btn-start-new-game').click();
+    await expect(modal).toHaveClass(/modal-hidden/);
+    
+    // Check URL has board_size=13
+    await expect(page).toHaveURL(/board_size=13/);
   });
 
 });

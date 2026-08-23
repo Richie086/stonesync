@@ -476,6 +476,28 @@
       </aside>
     </main>
 
+    <!-- Board Size Prompt Overlay Modal -->
+    <div id="board-size-prompt-overlay" class="modal-overlay modal-hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Create New Match</h3>
+        </div>
+        <div class="modal-body">
+          <p style="margin-bottom: 14px; color: var(--text-secondary); font-size: 0.9rem;">
+            Select the board size for this new game:
+          </p>
+          <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+            <button class="btn btn-primary board-size-btn" data-size="9" style="flex: 1;">9x9</button>
+            <button class="btn btn-secondary board-size-btn" data-size="13" style="flex: 1;">13x13</button>
+            <button class="btn btn-secondary board-size-btn" data-size="19" style="flex: 1;">19x19</button>
+          </div>
+          <button id="btn-start-new-game" class="btn btn-primary btn-full">
+            Start Game
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Player Name Prompt Overlay Modal -->
     <div id="name-prompt-overlay" class="modal-overlay modal-hidden">
       <div class="modal-card">

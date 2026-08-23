@@ -43,3 +43,8 @@ artifacts/
 # Local Environment
 .env.local
 .env.*.local
+
+# Node & Playwright
+node_modules/
+playwright-report/
+test-results/
