@@ -1,0 +1,27 @@
+FROM node:20-bookworm
+
+# Install Python and pip
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
+
+WORKDIR /app
+
+# Set up virtual environment for Python
+RUN python3 -m venv .venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Copy python requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy node requirements and install
+COPY package*.json ./
+RUN npm install
+
+# Install Playwright browsers and OS dependencies
+RUN npx playwright install --with-deps chromium
+
+# Copy the rest of the application
+COPY . .
+
+# Run the tests
+CMD ["npx", "playwright", "test"]

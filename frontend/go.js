@@ -1863,12 +1863,57 @@
   }
 
   // --- 12. Initialization ---
-  updateUrlAndControls();
-  connectWebSocket();
-  if (!getPlayerName()) {
-    showNamePromptModal();
+  const boardSizePromptOverlay = document.getElementById('board-size-prompt-overlay');
+  const boardSizeBtns = document.querySelectorAll('.board-size-btn');
+  const btnStartNewGame = document.getElementById('btn-start-new-game');
+  let selectedNewBoardSize = 9; // Default for the prompt
+
+  if (boardSizeBtns && boardSizeBtns.length > 0) {
+    boardSizeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Remove primary class from all, add secondary
+        boardSizeBtns.forEach(b => {
+          b.classList.remove('btn-primary');
+          b.classList.add('btn-secondary');
+        });
+        // Add primary to clicked
+        e.target.classList.remove('btn-secondary');
+        e.target.classList.add('btn-primary');
+        selectedNewBoardSize = parseInt(e.target.getAttribute('data-size'), 10);
+      });
+    });
   }
-  setTimeout(resizeCanvas, 50);
+
+  if (btnStartNewGame) {
+    btnStartNewGame.addEventListener('click', () => {
+      if (boardSizePromptOverlay) boardSizePromptOverlay.classList.add('modal-hidden');
+      currentBoardSize = selectedNewBoardSize;
+      if (boardSizeSelect) boardSizeSelect.value = currentBoardSize.toString();
+      updateUrlAndControls();
+      
+      connectWebSocket();
+      if (!getPlayerName()) {
+        showNamePromptModal();
+      }
+      setTimeout(resizeCanvas, 50);
+    });
+  }
+
+  // Check if we need to prompt for board size (e.g. creating a new game)
+  // We assume a new game is being created if the URL doesn't have a board_size parameter
+  // AND the room is not the default 'stonesync-main'
+  const isNewGameUrl = !urlParams.has('board_size') && currentRoomId !== 'stonesync-main';
+
+  if (isNewGameUrl && boardSizePromptOverlay) {
+    boardSizePromptOverlay.classList.remove('modal-hidden');
+  } else {
+    updateUrlAndControls();
+    connectWebSocket();
+    if (!getPlayerName()) {
+      showNamePromptModal();
+    }
+    setTimeout(resizeCanvas, 50);
+  }
 
 })();
 
