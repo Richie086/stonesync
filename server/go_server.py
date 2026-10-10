@@ -359,14 +359,14 @@ class RoomManager:
                 if requested == "both":
                     room.is_debug = True
                     room.is_solo = True
-                    for client_ws, pid in list(room.clients.items()):
+                    for client_ws, pid in list(room.connections.items()):
                         st = room.get_state_payload()
                         st["your_role"] = room.game.current_player
                         await client_ws.send_text(json.dumps(st))
                 elif requested in ("B", "W"):
                     room.is_debug = False
                     new_role = room.register_player(player_id, preferred_color=requested)
-                    for client_ws, pid in list(room.clients.items()):
+                    for client_ws, pid in list(room.connections.items()):
                         client_role = room.players.get(pid, 'observer')
                         st = room.get_state_payload()
                         st["your_role"] = client_role
@@ -396,6 +396,7 @@ class RoomManager:
                     )
                     state = room.get_state_payload()
                     state["last_action"] = {"action": "reset", "by": role}
+                    await room.broadcast(state)
                     await room.trigger_ai_turn_if_needed()
                 except ValueError as err:
                     await websocket.send_text(json.dumps({"type": "error", "message": str(err)}))
@@ -413,7 +414,7 @@ class RoomManager:
                     target_pid = data.get("target_player_id")
                     if target_pid in room.players:
                         del room.players[target_pid]
-                    for client_ws, pid in list(room.clients.items()):
+                    for client_ws, pid in list(room.connections.items()):
                         if pid == target_pid:
                             try:
                                 await client_ws.send_text(json.dumps({"type": "kicked", "message": "You have been kicked by the room admin."}))
